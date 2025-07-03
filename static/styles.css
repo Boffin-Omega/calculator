@@ -32,7 +32,7 @@
     background-color: rgba(118, 130, 110, 0.891);
     height: 90px; /* why cant i use percentage*/
 }
-.other-buttons{
+.clear-buttons{
     display: flex;
     justify-content: flex-end;
     padding-top: 10px;
@@ -60,7 +60,7 @@
     border: 1px solid white;
     
 }
-.other-buttons > div{
+.clear-buttons > div{
     flex: 0;
 }
 .ac{

@@ -19,4 +19,11 @@ function draw_buttons(){
 }
 document.addEventListener("DOMContentLoaded",()=>{
     draw_buttons();
+
+    let display = document.querySelector(".display");
+    document.querySelector(".clear-buttons").addEventListener("click",(e)=>{
+        if (e.target.id === "ac") display.textContent = "";
+        else display.textContent = display.textContent.slice(0,-1);
+    })
+
 })
