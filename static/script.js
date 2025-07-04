@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded",()=>{
                 if (is_f(display.textContent)) value = parseFloat(display.textContent);
                 else value = parseInt(display.textContent);
                 result = eval(result,value,operator);
-                display.textContent = result;
+                display.textContent = result.toFixed(11);
                 op_s = true;
                 value = null;
             }
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded",()=>{
                         if (is_f(display.textContent)) value = parseFloat(display.textContent);
                         else value = parseInt(display.textContent);
                         result = eval(result,value,operator);
-                        display.textContent = `${result}`;
+                        display.textContent = `${result.toFixed(11)}`;
                         op_s = true;
                         value = null;
                     }
@@ -98,8 +98,9 @@ document.addEventListener("DOMContentLoaded",()=>{
                     else value = parseInt(display.textContent);
                     display.textContent = "";
                     op_s = false;
-                } 
-                display.textContent+=key;
+                }
+
+                if (display.textContent.length<13) display.textContent+=key;
             }
         }
     })

@@ -4,8 +4,8 @@
 }
 
 .nav-bar{
-    background-color: gray;
-    color: whitesmoke;
+    background-color: #CC2B6B;
+    color: #ffffff;
     width: 100%;
     height: 100px;
     font-size: 60px;
@@ -17,7 +17,7 @@
     display: flex;
     flex-direction: column;
     padding: 20px 15px;
-    background-color: black;
+    background-color: #FFBCCD;
     width: 250px;
     margin: auto;
     gap:10px;
@@ -29,7 +29,7 @@
     padding-right: 2px;
     font-size: 40px;
     width: 100%;
-    background-color: rgba(118, 130, 110, 0.891);
+    background-color: #FFE9EF;
     height: 90px; /* why cant i use percentage*/
 }
 .clear-buttons{
@@ -49,23 +49,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
-
     font-size: 20px;
     color: white;
     border-radius: 30px;
-    background-color: lightslategray;
+    background-color: #FC809F;
     font-weight: bolder;
     padding: 10px;
-
     border: 1px solid white;
-    
 }
 .clear-buttons > div{
     flex: 0;
 }
 .ac{
-    background-color: rgb(255, 175, 3);
+    background-color: rgb(0 0 0);
 }
 .o-button{
-    background-color: darkslategray;
+    background-color: #FF9CB5;
 }
