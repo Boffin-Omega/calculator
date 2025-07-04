@@ -1,12 +1,11 @@
+const keypad_values = [
+    "7","8","9","/",
+    "4","5","6","*",
+    "1","2","3","-",
+    ".","0","=","+"
+];
 function draw_buttons(){
         let keypad = document.querySelector(".keypad"); //this line is needed, cant make it global
-
-        const keypad_values = [
-            "7","8","9","/",
-            "4","5","6","*",
-            "1","2","3","-",
-            ".","0","=","+"
-        ];
         //to create keypad
         for(let key in keypad_values){
             let new_key = document.createElement("div");
@@ -28,10 +27,15 @@ function eval(a,b,operator){
         default : return "";
     }
 }
+//checks if given number string is float
 function is_f(number){
     return number.includes(".");
 }
-
+//rounds off number to decimalPlaces decimalPlaces
+function round(num, decimalPlaces) {
+  const multiplier = Math.pow(10, decimalPlaces);
+  return Math.round(num * multiplier) / multiplier;
+}
 let result = null;
 let value = null;
 let operator = null;
@@ -40,30 +44,28 @@ let op_s = false; // stores if current operation is successful
 document.addEventListener("DOMContentLoaded",()=>{
     draw_buttons();
 
-    let display = document.querySelector(".display");
-    let dot = document.querySelector("#\\.");
-
-    document.querySelector(".clear-buttons").addEventListener("click",(e)=>{
-        if (e.target.id === "ac"){
-            display.textContent = "";
-            result = value = operator= null;
+    //essentially, core logic of calc is same, whether input is from clicking buttons or from keyboard
+    //declared it here cuz of scope reasons. if i declared it globally, wouldnt be able to access display
+    function calc_core(key){
+        if(key === "Enter"){
+            document.querySelector("#\\=").click();
+            return;
+        } 
+        else if (key=== "Backspace"){
+            document.querySelector("#del").click();
+            return;
         }
-        else display.textContent = display.textContent.slice(0,-1);
-    })
-    document.querySelector(".keypad").addEventListener("click",(e)=>{
         if(result =="Error"){
             display.textContent = ""; //if error occured then clear display
             result = null;
         } 
-        //lets work with dealing with integers for now
-        let key = e.target.textContent;
         //if symbol key entered
         if("/*+-=".includes(key)){
             if(key ==="=" && !op_s){
                 if (is_f(display.textContent)) value = parseFloat(display.textContent);
                 else value = parseInt(display.textContent);
                 result = eval(result,value,operator);
-                display.textContent = result.toFixed(11);
+                display.textContent = round(result,11);
                 op_s = true;
                 value = null;
             }
@@ -79,7 +81,7 @@ document.addEventListener("DOMContentLoaded",()=>{
                         if (is_f(display.textContent)) value = parseFloat(display.textContent);
                         else value = parseInt(display.textContent);
                         result = eval(result,value,operator);
-                        display.textContent = `${result.toFixed(11)}`;
+                        display.textContent = `${round(result,11)}`;
                         op_s = true;
                         value = null;
                     }
@@ -87,7 +89,7 @@ document.addEventListener("DOMContentLoaded",()=>{
                 }
             }
         }
-        //if numeric key was entered
+        //if numeric key or . was entered
         else{
             if(key === "."){
                 if (!display.textContent.includes(".")) display.textContent+=key;
@@ -99,9 +101,32 @@ document.addEventListener("DOMContentLoaded",()=>{
                     display.textContent = "";
                     op_s = false;
                 }
-
                 if (display.textContent.length<13) display.textContent+=key;
             }
+        }
+    }
+
+    let display = document.querySelector(".display");
+    //for ac and del buttons
+    document.querySelector(".clear-buttons").addEventListener("click",(e)=>{
+        if (e.target.id === "ac"){
+            display.textContent = "";
+            result = value = operator= null;
+        }
+        else display.textContent = display.textContent.slice(0,-1);
+    })
+    //for rest of the keypad buttons
+    document.querySelector(".keypad").addEventListener("click",(e)=>{
+        let key = e.target.textContent;
+        calc_core(key);
+
+    })
+    //for keyboard input
+    document.addEventListener("keydown",(e)=>{
+        let key = e.key;
+        console.log(key)
+        if (keypad_values.includes(key) || key==="Enter" || key ==="Backspace"){
+            calc_core(key);
         }
     })
 })
