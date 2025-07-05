@@ -4,15 +4,18 @@ const keypad_values = [
     "1","2","3","-",
     ".","0","=","+"
 ];
+const MAX_DISPLAY_LENGTH = 13;
+const MAX_DECIMALS = 11;
+
 function draw_buttons(){
         let keypad = document.querySelector(".keypad"); //this line is needed, cant make it global
         //to create keypad
-        for(let key in keypad_values){
+        for(let key of keypad_values){
             let new_key = document.createElement("div");
             new_key.className = "button";
-            new_key.textContent = keypad_values[key];
-            new_key.id = keypad_values[key];
-            if ("/+=*-".includes(keypad_values[key])) new_key.classList.add("o-button");
+            new_key.textContent = key;
+            new_key.id = key;
+            if ("/+=*-".includes(key)) new_key.classList.add("o-button");
             keypad.appendChild(new_key);
         }
         
@@ -20,21 +23,18 @@ function draw_buttons(){
 function eval(a,b,operator){
     if(b===null) return a; //when user does smt like 8+=
     switch(operator){
-        case "/" : if (b!=0) return a / b; else return "Error"
+        case "/" : if (b!=0) return a / b; else return "Error";
         case "+": return a + b;
         case "-": return a - b;
         case "*": return a*b;
         default : return "";
     }
 }
-//checks if given number string is float
-function is_f(number){
-    return number.includes(".");
-}
 //rounds off number to decimalPlaces decimalPlaces
 function round(num, decimalPlaces) {
-  const multiplier = Math.pow(10, decimalPlaces);
-  return Math.round(num * multiplier) / multiplier;
+    if (num === "Error") return num;
+    const multiplier = Math.pow(10, decimalPlaces);
+    return Math.round(num * multiplier) / multiplier;
 }
 let result = null;
 let value = null;
@@ -62,26 +62,33 @@ document.addEventListener("DOMContentLoaded",()=>{
         //if symbol key entered
         if("/*+-=".includes(key)){
             if(key ==="=" && !op_s){
-                if (is_f(display.textContent)) value = parseFloat(display.textContent);
-                else value = parseInt(display.textContent);
+                if (display.textContent!=="") value = parseFloat(display.textContent);
+                else return;
                 result = eval(result,value,operator);
-                display.textContent = round(result,11);
-                op_s = true;
-                value = null;
+                if (!Number.isNaN(result)) {
+                    display.textContent = round(result,MAX_DECIMALS);
+                    op_s = true;
+                }
+                operator = null;
+                value = null;            
             }
             else{
-                if(!operator){ //first operation
+                if(!operator && display.textContent !== ""){ //first operation and display shouldn't be empty
                     operator = key;
-                    if (is_f(display.textContent)) result = parseFloat(display.textContent);
-                    else result = parseInt(display.textContent);
+                    result = parseFloat(display.textContent);
                     display.textContent = "";
                 }
                 else{
                     if(display.textContent &&!op_s){ //deal with 8+-/ case & 8+2+-, assumes value on screen is entered value
-                        if (is_f(display.textContent)) value = parseFloat(display.textContent);
-                        else value = parseInt(display.textContent);
+                        if (display.textContent!=="") value = parseFloat(display.textContent);
+                        else return;
                         result = eval(result,value,operator);
-                        display.textContent = `${round(result,11)}`;
+                        if (!Number.isNaN(result)) display.textContent = `${round(result,MAX_DECIMALS)}`;
+                        else{
+                            operator = null;
+                            result = null;
+                            value = null;
+                        }
                         op_s = true;
                         value = null;
                     }
@@ -92,16 +99,18 @@ document.addEventListener("DOMContentLoaded",()=>{
         //if numeric key or . was entered
         else{
             if(key === "."){
-                if (!display.textContent.includes(".")) display.textContent+=key;
+                if (!display.textContent.includes(".")){
+                    if (display.textContent === "") display.textContent+= `0${key}`;
+                    else display.textContent+=key;
+                } 
             }
             else{
                 if(op_s && value==null){
-                    if (is_f(display.textContent)) value = parseFloat(display.textContent);
-                    else value = parseInt(display.textContent);
+                    value = parseFloat(display.textContent);
                     display.textContent = "";
                     op_s = false;
                 }
-                if (display.textContent.length<13) display.textContent+=key;
+                if (display.textContent.length<MAX_DISPLAY_LENGTH) display.textContent+=key;
             }
         }
     }
@@ -109,11 +118,24 @@ document.addEventListener("DOMContentLoaded",()=>{
     let display = document.querySelector(".display");
     //for ac and del buttons
     document.querySelector(".clear-buttons").addEventListener("click",(e)=>{
+        //ac button was clicked
         if (e.target.id === "ac"){
             display.textContent = "";
             result = value = operator= null;
         }
-        else display.textContent = display.textContent.slice(0,-1);
+        //del or backspace button was clicked
+        else {
+            if (display.textContent==="Error") display.textContent = "";
+            display.textContent = display.textContent.slice(0,-1);
+
+            if (!op){
+                result = parseFloat(display.textContent);
+            }
+            else{
+                value = parseFloat(display.textContent);
+            }
+            //if (display.textContent === "") operator = null;
+        }
     })
     //for rest of the keypad buttons
     document.querySelector(".keypad").addEventListener("click",(e)=>{
